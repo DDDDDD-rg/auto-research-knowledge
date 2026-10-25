@@ -1,0 +1,4 @@
+interface:
+  display_name: "自动研究知识库"
+  short_description: "精读研究文献、核查计算复现，并维护可追溯的项目知识库"
+  default_prompt: "使用 $auto-research-knowledge 围绕我提出的研究问题完成文献检索和精读，更新知识库并给出研究建议；涉及复现时先说明计划。"

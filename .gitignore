@@ -1,0 +1,13 @@
+# This repository distributes the skill and blank templates.
+# Knowledge generated while trying it in this repository stays local.
+/Research_Knowledge/
+**/local/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+*.zip
+.DS_Store
+Thumbs.db
