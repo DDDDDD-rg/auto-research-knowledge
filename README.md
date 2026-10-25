@@ -4,6 +4,13 @@
 
 调用名称：auto-research-knowledge。
 
+## 2026-10-26 更新
+
+- 新增多对话并发归档：独立草稿、短期写锁和SHA-256版本检查，避免旧稿覆盖后来版本。
+- 发生冲突时保留基准与双方草稿；支持备份、写入失败回滚和进程中断恢复。
+- 新增14项行为测试，并更新初始化流程、项目规则示例和操作说明。
+- 写入工具使用Python 3.9+标准库；普通查库继续沿用原来的工作方式。
+
 ## 工作方式
 
 - 日常研究讨论、结果解释和方案建议自动查已有知识库，无需每次手动调用；按问题读取相关内容。
@@ -30,11 +37,26 @@
 这次只建立入口和问题地图。
 ~~~
 
-初始化会将 skill 内的空白模板复制到目标项目的 Research_Knowledge，仅补充缺失文件。
+初始化会创建缺失的 Research_Knowledge 目录，再通过并发归档工具将空白模板写入缺失入口；已有知识文件保留原样。
 
 4. 如果希望后续日常研究讨论自动读取知识库，可将 [AGENTS.example.md](AGENTS.example.md) 中适用的规则合并到目标项目的 AGENTS.md。
 
 此安装方式作用于选择的项目。其他项目需要时再单独安装；不要求用户级安装。
+
+## 多对话同时工作
+
+不同对话可以同时阅读和编辑独立草稿，正式归档使用短暂写锁并核对版本。若另一对话已经修改同一文件，工具会拒绝旧版本覆盖，保留基准、自己的草稿和冲突时版本，合并后再归档。
+
+正式归档需要Python 3.9+，无需安装额外Python包。命令和恢复方式见[并发写入规范](.agents/skills/auto-research-knowledge/references/concurrency.md)。所有写入者都需遵守此流程；已有对话更新skill后，应在下一次归档前重新读取规范。独立worktree和不同机器需另行同步。
+
+目标项目使用Git时，将以下本地工作目录合并进原有 `.gitignore`：
+
+```gitignore
+/Research_Knowledge/_coordination/
+/.knowledge-write-tests/
+```
+
+在本仓库根目录可运行 `python .agents/skills/auto-research-knowledge/scripts/test_knowledge_write.py` 验证机制。测试使用独立临时项目，包含真实双进程争写、同名新建及中断恢复。
 
 ## 调用示例
 
@@ -61,10 +83,12 @@
 - [SKILL.md](.agents/skills/auto-research-knowledge/SKILL.md)：触发条件、工作流程、知识维护和交付标准。
 - [文献与证据规范](.agents/skills/auto-research-knowledge/references/literature.md)：阅读范围、出处和证据链。
 - [复现规范](.agents/skills/auto-research-knowledge/references/reproduction.md)：资源估算、实际运行及对照标准。
+- [并发写入规范](.agents/skills/auto-research-knowledge/references/concurrency.md)：独立草稿、冲突合并及恢复。
+- [写入工具](.agents/skills/auto-research-knowledge/scripts/knowledge_write.py)与[行为测试](.agents/skills/auto-research-knowledge/scripts/test_knowledge_write.py)：本地协调与验证。
 - [空白知识库模板](.agents/skills/auto-research-knowledge/assets/knowledge-base/INDEX.md)：索引、项目地图和决策记录。
 - [项目规则示例](AGENTS.example.md)：按需合并的日常查库约定。
 
-本 skill 的核心为文字指令，研究任务通过 Codex 当时可用的搜索、文件和计算工具执行。全文获取范围、输入数据与实际运行环境记录在具体任务中。
+研究任务由skill指令与Codex当时可用的搜索、文件和计算工具执行；正式知识归档由附带Python脚本协调。全文获取范围、输入数据与实际运行环境记录在具体任务中。
 
 ## 下载与更新
 

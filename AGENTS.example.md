@@ -12,3 +12,11 @@
 - 关键判断注明实际参考的知识条目、项目文件或网页出处；发现资料与既有笔记不一致时比较证据和适用条件，再说明判断或修订原因。
 - 轻量本机复现可自主进行；预计长时计算或大量下载时先说明资源需求。
 - 按本项目现有 Git 规则保存知识文件，提交和推送遵循当前任务授权。
+
+## 多对话并发归档
+
+- 每轮正式归档前重新读取 `.agents/skills/auto-research-knowledge/references/concurrency.md`，已有对话也刷新流程。
+- 各任务通过 `.agents/skills/auto-research-knowledge/scripts/knowledge_write.py` 创建独立 run，checkout 最新基准，只编辑返回的 draft，再经 check/commit 归档；不直接覆盖正式笔记、索引和主题。
+- 相关笔记与共享导航同批准备；版本冲突时保留基准和双方草稿，新 run 读取最新版本并逐段合并，不强制覆盖。归档命令不执行 Git 提交或推送。
+- 普通阅读与草稿可并行，短暂写锁只保护正式归档。busy 稍后重试；中断恢复按并发规范处理；只有 committed 才报告归档完成。
+- 使用Git时，将 `Research_Knowledge/_coordination/` 和 `.knowledge-write-tests/` 加入项目忽略规则。该机制协调遵守流程的同一本地目录，不跨独立worktree/机器，不拦截绕过工具的外部编辑。
